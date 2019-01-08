@@ -73,7 +73,7 @@ public:
 		tabX = createTabx(tabX, size, tabVectorB);	
 		setMLI();
 		double* seidel = seidelMethod(tabMatrixA,matrixAlfa, vectorBeta, tabX, size,MLI);
-		print(size, matrixAlfa, tabVectorB, "ALFA SEIDEL", "BETA SEIDEL");
+		print(size, matrixAlfa, vectorBeta, "ALFA SEIDEL", "BETA SEIDEL");
 		std::cout << "\n X";
 		printX(size, tabX);
 	}
@@ -95,7 +95,11 @@ public:
 				if (iterationNumber == 0) 
 				{
 					for (int i = 0; i < size; i++)
+					{
 						tabX[i] = tabVectorBeta[i];
+					    std::cout << "Iteracja zerowa" << tabX[i] << std::endl;
+
+					}
 					iterationNumber++;
 				}
 				else
@@ -106,7 +110,7 @@ public:
 						{
 							for (int j = 1; j < size; j++)
 							{
-								sum1 += tabMatrixAlfa[i][j] * tabX[j];
+								sum1 += tabMatrixAlfa[0][j] * tabX[j];
 							}
 							double aab = sum1 + tabVectorBeta[it];
 							tabX[it] = sum1 + tabVectorBeta[it];
@@ -236,7 +240,7 @@ private:
 	}
 
 	double* createTabVectorBeta(double * tabVectorBeta, int size, double * tabVectorB, double **tabMatrixA) { // funkcja alokujaca pamiec dla nowego wektora
-		return tabVectorBeta = new double[size];
+		tabVectorBeta = new double[size];
 		for (int i = 0; i < size; i++)
 		{
 			tabVectorBeta[i] = tabVectorB[i] / tabMatrixA[i][i];
