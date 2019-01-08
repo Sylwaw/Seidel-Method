@@ -8,9 +8,45 @@
 class Matrix
 {
 public:
+
+	void run() {
+		readMatrixFromFile("matrix.txt");
+		std::cout << "\n";
+		print(size, tabMatrixA, tabVectorB, "MACIERZ A", "WEKTOR B"); // wypisywanie macierzy i wektora do konsoli, coœ jest Ÿle bo na przek¹tnej powinny byæ same zera
+		std::cout << "\n";
+		double** matrixAlfa = createTabMatrixAlfa(tabMatrixAlfa, size, tabMatrixA); // tworzenie macierzy alfa i jej uzupelnienie
+		double* vectorBeta = createTabVectorBeta(tabVectorBeta, size, tabVectorB, tabMatrixA); // tworzenie vectoru beta i jego uzupelnienie
+		tabX = createTabx(tabX, size, vectorBeta);
+
+		setMLI();
+		double* seidel = seidelMethod(tabMatrixA, matrixAlfa, vectorBeta, tabX, size, MLI); // SEIDEL
+		std::cout << "\n";
+		print(size, matrixAlfa, vectorBeta, "MATRIX ALFA", "VECTOR BETA");
+		std::cout << "\n";
+		printX(size, tabX);
+		std::cout << "\n";
+
+		generateRaportToFile("raport.txt", "ZESTAW 1", tabMatrixA, tabVectorB, matrixAlfa, vectorBeta, MLI,tabX,tabY,iterationNumber); // generowanie raportu
+
+
+	}
+
+
+private:
+	std::list<double> listTMP; // zmienna uzyta dla okreslenia wielkosci macierzy
+	double ** tabMatrixA = 0; // macierz poczatkowa
+	double ** tabMatrixAlfa = 0; 
+	double * tabVectorB = 0;
+	double * tabVectorBeta = 0;
+	double* tabX = 0; // ostatnia iteracja
+	double* tabY = 0; // poprzednia iteracja
+	double x = 0;
+	int MLI = 0; // maksymalna liczba iteracji
+	int iterationNumber = 0; // ilosc iteracji w seidlu
+	int size = 0; // zmienna odpowiedzialna za okreslenie wielkosci macierzy
+
 	void readMatrixFromFile(std::string fileName) { // wczytywanie danych z pliku do tablic
 		std::fstream file;
-		int size = 0; // zmienna odpowiedzialna za okreslenie wielkosci macierzy
 		bool checkSizeMatrix = true;
 		bool checkCreateMatrix = true;
 		bool createMatrix = true;
@@ -66,111 +102,8 @@ public:
 			}
 			file.close(); // konczenie polaczenia z plikiem
 			std::cout << "\nROZMIAR: " << size;
-			print(size, tabMatrixA, tabVectorB, "MACIERZ A", "WEKTOR B"); // wypisywanie macierzy i wektora do konsoli, coœ jest Ÿle bo na przek¹tnej powinny byæ same zera
 		}
-		double** matrixAlfa = createTabMatrixAlfa(tabMatrixAlfa, size, tabMatrixA);
-		double* vectorBeta = createTabVectorBeta(tabVectorBeta, size, tabVectorB, tabMatrixA);
-		tabX = createTabx(tabX, size, tabVectorB);	
-		setMLI();
-		double* seidel = seidelMethod(tabMatrixA,matrixAlfa, vectorBeta, tabX, size,MLI);
-		print(size, matrixAlfa, tabVectorB, "ALFA SEIDEL", "BETA SEIDEL");
-		std::cout << "\n X";
-		printX(size, tabX);
 	}
-
-	double* seidelMethod(double** tabMatrixA, double** tabMatrixAlfa, double* tabVectorBeta, double* tabX, int size, int MLI) // to jest to co robilas???
-	{
-		int i = 0, j = 0, iterationNumber = 0;
-		double normI = 1;
-		double tmpX;
-		double epsilon = 0.0001;
-		double sum1 = 0, sum2 = 0;
-		
-		bool a = divideByZero(tabMatrixA, size);
-
-		if (a == false)
-		{
-			do {
-				tmpX = tabX[size - 1];
-				if (iterationNumber == 0) 
-				{
-					for (int i = 0; i < size; i++)
-						tabX[i] = tabVectorBeta[i];
-					iterationNumber++;
-				}
-				else
-				{
-					for (int it = 0; it < size; it++) // it - index x 
-					{
-						if (it == 0)
-						{
-							for (int j = 1; j < size; j++)
-							{
-								sum1 += tabMatrixAlfa[i][j] * tabX[j];
-							}
-							double aab = sum1 + tabVectorBeta[it];
-							tabX[it] = sum1 + tabVectorBeta[it];
-							normI = fabs(tabX[size - 1] - tmpX);
-							iterationNumber++;
-						}
-						else
-						{
-							for (int i = 1; i < size; i++)
-							{
-								for (int j = 0; j < size - 1; j++)
-								{
-									sum1 += tabMatrixAlfa[i][j] * tabX[j];  
-								}
-							}
-							for (int i = 1; i <= size; i++)
-							{
-								for (int j = i+1; j < size; j++)
-								{
-									sum2 += tabMatrixAlfa[i][j] * tabX[j];
-								}
-							}
-							double ab = sum1 + sum2 + tabVectorBeta[it];
-							tabX[it] = sum1 + sum2 + tabVectorBeta[it];
-							normI = fabs(tabX[size - 1] - tmpX);
-							iterationNumber++;
-						}
-					}
-
-				}
-			} while (normI >= epsilon && iterationNumber <= MLI);
-			return tabX;
-		}
-		else
-		{
-			std::cout << "Nie mo¿na wykonaæ obliczeñ - dzielenie przez zero";
-			exit(1);
-		}
-
-	}
-
-	void generateRaportToFile(std::string fileName, int ** tabMatrixA, int * tabVectorB, int ** tabMatrixAlfa, int * tabVectorBeta) { // funkcja generujaca raport do pliku
-
-	}
-
-	void setMLI() { // wczytywanie maxymalnej liczby iteracji
-		std::cout << "Podaj maxymalna liczbe iteracji: ";
-		std::cin >> MLI;
-		std::cout << "\n";
-	}
-	int getMLI() {
-		return MLI;
-	}
-
-private:
-	std::list<double> listTMP; // zmienna uzyta dla okreslenia wielkosci macierzy
-	double ** tabMatrixA = 0;
-	double ** tabMatrixAlfa = 0;
-	double * tabVectorB = 0;
-	double * tabVectorBeta = 0;
-	double* tabX = 0;
-	double x = 0;
-	int MLI = 0;
-
 
 	int sizeMatrix(int tmpValue) { // okreslenie rozmiaru tablicy
 		listTMP.push_back(tmpValue);
@@ -196,17 +129,17 @@ private:
 	}
 
 	void print(int size, double ** tabMatrix, double * tabVector, std::string matrixA, std::string vectorB) { // wypisywanie wartosci do konsoli
-		std::cout << "\n" << matrixA << std::endl;
+		std::cout << "\n" << matrixA << "\n";
 		for (int i = 0; i < size; i++)
 		{
 			for (int j = 0; j < size; j++)
 			{
 				std::cout << tabMatrix[i][j] << "\t\t";
 			}
-			std::cout << "\n";
+			std::cout << "\n\n";
 		}
 
-		std::cout << vectorB << std::endl;
+		std::cout << vectorB << "\n";
 		for (int i = 0; i < size; i++)
 		{
 			std::cout << tabVector[i] << " ";
@@ -215,7 +148,7 @@ private:
 
 	void printX(int size, double *tabX)
 	{
-		std::cout << "tabX" << std::endl;
+		std::cout << "\nTAB X" << std::endl;
 		for (int i = 0; i < size; i++)
 		{
 			std::cout << tabX[i] << ", ";
@@ -236,7 +169,7 @@ private:
 	}
 
 	double* createTabVectorBeta(double * tabVectorBeta, int size, double * tabVectorB, double **tabMatrixA) { // funkcja alokujaca pamiec dla nowego wektora
-		return tabVectorBeta = new double[size];
+		tabVectorBeta = new double[size];
 		for (int i = 0; i < size; i++)
 		{
 			tabVectorBeta[i] = tabVectorB[i] / tabMatrixA[i][i];
@@ -287,6 +220,149 @@ private:
 		return a;
 	}
 
+	double* seidelMethod(double** tabMatrixA, double** tabMatrixAlfa, double* tabVectorBeta, double* tabX, int size, int MLI)
+	{
+		int i = 0, j = 0;
+		double normI = 1;
+		double tmpX;
+		double epsilon = 0.0001;
+		double sum1 = 0, sum2 = 0;
+		
+
+		bool a = divideByZero(tabMatrixA, size);
+
+		if (a == false)
+		{
+			do {
+				iterationNumber++;
+				tmpX = tabX[size - 1];
+				if (iterationNumber == 1)
+				{
+					for (int i = 0; i < size; i++)
+						tabX[i] = tabVectorBeta[i];
+					
+				}
+				else
+				{
+					for (int it = 0; it < size; it++) // it - index x 
+					{
+						if (it == 0)
+						{
+							for (int j = 1; j < size; j++)
+							{
+								sum1 += tabMatrixAlfa[i][j] * tabX[j];
+							}
+							double aab = sum1 + tabVectorBeta[it];
+							tabX[it] = sum1 + tabVectorBeta[it];
+							normI = fabs(tabX[size - 1] - tmpX);
+						}
+						else
+						{
+							for (int i = 1; i < size; i++)
+							{
+								for (int j = 0; j < size - 1; j++)
+								{
+									sum1 += tabMatrixAlfa[i][j] * tabX[j];
+								}
+							}
+							for (int i = 1; i <= size; i++)
+							{
+								for (int j = i + 1; j < size; j++)
+								{
+									sum2 += tabMatrixAlfa[i][j] * tabX[j];
+								}
+							}
+							double ab = sum1 + sum2 + tabVectorBeta[it];
+							tabX[it] = sum1 + sum2 + tabVectorBeta[it];
+							normI = fabs(tabX[size - 1] - tmpX);
+						}
+						if (it == (size - 1)) {
+							tabY = new double[size];
+							double * tmp;
+							tmp = tabX;
+							tabX = tabY;
+							tabY = tmp;
+						}
+					}
+				}
+			} while (normI >= epsilon && iterationNumber < MLI);
+			return tabX;
+		}
+		else
+		{
+			std::cout << "Nie mo¿na wykonaæ obliczeñ - dzielenie przez zero";
+			exit(1);
+		}
+
+	}
+
+	void generateRaportToFile(std::string fileName, std::string raportName, double ** tabMatrixA, double * tabVectorB,
+		double ** tabMatrixAlfa, double * tabVectorBeta, int mli, double* tabX, double*tabY, int iteration) { // funkcja generujaca raport do pliku
+		std::fstream file;
+
+		file.open(fileName, std::ios::out | std::ios::trunc);
+
+		if (file.good() == true) {
+			file << "\n############# DANE WEJSCIOWE #############";
+			file << "\nn = 5";
+			file << "\nepsilon = 0.0001";
+			file << "\nMLI = " << mli << "\n";
+			file << "\n\t" << raportName << "\n";
+			file << "\n" << "MACIERZ A" << "\n";
+			for (int i = 0; i < size; i++)
+			{
+				for (int j = 0; j < size; j++)
+				{
+					file << tabMatrixA[i][j] << "\t";
+				}
+				file << "\n";
+			}
+
+			file << "\n" << "WEKTOR B" << "\n";
+			for (int i = 0; i < size; i++)
+			{
+				file << tabVectorB[i] << "\t";
+			}
+			file << "\n##########################################\n";
+			file << "\n############# DANE POSREDNIE #############\n";
+			file << "\n" << "MACIERZ ALFA" << "\n";
+			for (int i = 0; i < size; i++)
+			{
+				for (int j = 0; j < size; j++)
+				{
+					file << tabMatrixAlfa[i][j] << "\t";
+				}
+				file << "\n";
+			}
+
+			file << "\n" << "WEKTOR BETA" << "\n";
+			for (int i = 0; i < size; i++)
+			{
+				file << tabVectorBeta[i] << "\t";
+			}
+			file << "\n##########################################\n";
+			file << "\n################# WYNIKI #################\n";
+			file << "\n" << "WEKTOR - OSTATNIA ITERACJA" << "\n";
+			for (int i = 0; i < size; i++)
+			{
+				file << tabX[i] << "\t\t";
+			}
+
+			file << "\n" << "WEKTOR - POPRZEDNIA ITERACJA" << "\n";
+			for (int i = 0; i < size; i++)
+			{
+				file << tabY[i] << "\t\t";
+			}
+			file << "\n" << "ILOSC ITERACJI: "<< iteration << "\n";
+			file << "\n##########################################\n";
+		}
+	}
+
+	void setMLI() { // wczytywanie maxymalnej liczby iteracji
+		std::cout << "\nPodaj maxymalna liczbe iteracji: ";
+		std::cin >> MLI;
+		std::cout << "\n";
+	}
 
 };
 

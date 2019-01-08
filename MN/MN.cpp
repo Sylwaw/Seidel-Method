@@ -11,8 +11,7 @@
 int main()
 {
 	Matrix matrix;
-	matrix.readMatrixFromFile("matrix.txt");
-	_CrtDumpMemoryLeaks();
+	matrix.run();
 }
 
 // Run program: Ctrl + F5 or Debug > Start Without Debugging menu
