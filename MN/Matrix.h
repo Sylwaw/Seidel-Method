@@ -3,6 +3,7 @@
 #include <fstream>
 #include <string>
 #include <list>
+#include <cmath>
 
 class Matrix
 {
@@ -69,23 +70,29 @@ public:
 		}
 		double** matrixAlfa = createTabMatrixAlfa(tabMatrixAlfa, size, tabMatrixA);
 		double* vectorBeta = createTabVectorBeta(tabVectorBeta, size, tabVectorB, tabMatrixA);
-		tabX = createTabx(tabX, size, tabVectorB);
-		print(size, matrixAlfa, tabVectorB, "ALFA", "BETA");
-		double* seidel = seidelMethod(tabMatrixA,matrixAlfa, vectorBeta, tabX, size);
+		tabX = createTabx(tabX, size, tabVectorB);	
+		setMLI();
+		double* seidel = seidelMethod(tabMatrixA,matrixAlfa, vectorBeta, tabX, size,MLI);
+		print(size, matrixAlfa, tabVectorB, "ALFA SEIDEL", "BETA SEIDEL");
+		std::cout << "\n X";
+		printX(size, tabX);
 	}
 
-	double* seidelMethod(double** tabMatrixA, double** tabMatrixAlfa, double* tabVectorBeta, double* tabX, int size) // to jest to co robilas???
+	double* seidelMethod(double** tabMatrixA, double** tabMatrixAlfa, double* tabVectorBeta, double* tabX, int size, int MLI) // to jest to co robilas???
 	{
 		int i = 0, j = 0, iterationNumber = 0;
-		double normI = 0;
+		double normI = 1;
+		double tmpX;
+		double epsilon = 0.0001;
 		double sum1 = 0, sum2 = 0;
+		
 		bool a = divideByZero(tabMatrixA, size);
 
 		if (a == false)
 		{
 			do {
-
-				if (iterationNumber == 0) //powinno w to wejœæ gdzie jest to add to watch -.-
+				tmpX = tabX[size - 1];
+				if (iterationNumber == 0) 
 				{
 					for (int i = 0; i < size; i++)
 						tabX[i] = tabVectorBeta[i];
@@ -93,44 +100,52 @@ public:
 				}
 				else
 				{
-					for (int it = 0; it < size; it++)
+					for (int it = 0; it < size; it++) // it - index x 
 					{
-						if (it == 0)//albo chyba jednak jest ok, juz sie w tym pogubilam troche, mysle ¿e jest ok czyli powinno dzialac ja:D?
+						if (it == 0)
 						{
 							for (int j = 1; j < size; j++)
 							{
-								sum1 += tabMatrixAlfa[i][j] * tabX[j];//a tu by³o ok?
+								sum1 += tabMatrixAlfa[i][j] * tabX[j];
 							}
+							double aab = sum1 + tabVectorBeta[it];
 							tabX[it] = sum1 + tabVectorBeta[it];
+							normI = fabs(tabX[size - 1] - tmpX);
 							iterationNumber++;
 						}
 						else
 						{
-							for (int i = 1; i <= size; i++)
+							for (int i = 1; i < size; i++)
 							{
-								for (int j = 0; j <= size - 1; j++)//a mo¿e wypiszmy najpierw alfe i bete mo¿e przy tworzeniu jest b³¹d?
+								for (int j = 0; j < size - 1; j++)
 								{
-									sum1 += tabMatrixAlfa[i][j] * tabX[j];  // czekaj stop bo widze b³¹d we wzorze, zobacz sobie w tym czasie na to widzisz tu co? a co tu jest nie tak? tak chocby nie umiol komorki odczytac
+									sum1 += tabMatrixAlfa[i][j] * tabX[j];  
 								}
 							}
 							for (int i = 1; i <= size; i++)
 							{
-								for (int j = 2; j <= size; j++)
+								for (int j = i+1; j < size; j++)
 								{
 									sum2 += tabMatrixAlfa[i][j] * tabX[j];
 								}
 							}
+							double ab = sum1 + sum2 + tabVectorBeta[it];
 							tabX[it] = sum1 + sum2 + tabVectorBeta[it];
+							normI = fabs(tabX[size - 1] - tmpX);
 							iterationNumber++;
 						}
 					}
 
 				}
-			} while (normI <= epsilon && iterationNumber >= MLI);
+			} while (normI >= epsilon && iterationNumber <= MLI);
+			return tabX;
+		}
+		else
+		{
+			std::cout << "Nie mo¿na wykonaæ obliczeñ - dzielenie przez zero";
+			exit(1);
 		}
 
-		return tabX;//to sie mog³o nigdy nie koñczyæ chyba kuzwa no moze tak byc :D
-		//dodaæ sprawdzanie normy
 	}
 
 	void generateRaportToFile(std::string fileName, int ** tabMatrixA, int * tabVectorB, int ** tabMatrixAlfa, int * tabVectorBeta) { // funkcja generujaca raport do pliku
@@ -153,7 +168,7 @@ private:
 	double * tabVectorB = 0;
 	double * tabVectorBeta = 0;
 	double* tabX = 0;
-	double epsilon = 0.0001, x = 0;
+	double x = 0;
 	int MLI = 0;
 
 
@@ -266,7 +281,6 @@ private:
 				{
 					std::cout << "Obliczenia przerwane, nie mo¿na dzieliæ przez 0" << std::endl;
 					a = true;
-					exit(1);
 				}
 			}
 		}
