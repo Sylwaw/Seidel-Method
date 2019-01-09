@@ -26,7 +26,7 @@ public:
 		printX(size, tabX);
 		std::cout << "\n";
 
-		generateRaportToFile("raport.txt", "ZESTAW 1", tabMatrixA, tabVectorB, matrixAlfa, vectorBeta, MLI,tabX,tabY,iterationNumber); // generowanie raportu
+		generateRaportToFile("raport.txt", "ZESTAW 1", tabMatrixA, tabVectorB, matrixAlfa, vectorBeta, MLI, tabX, tabY, iterationNumber); // generowanie raportu
 
 
 	}
@@ -35,7 +35,7 @@ public:
 private:
 	std::list<double> listTMP; // zmienna uzyta dla okreslenia wielkosci macierzy
 	double ** tabMatrixA = 0; // macierz poczatkowa
-	double ** tabMatrixAlfa = 0; 
+	double ** tabMatrixAlfa = 0;
 	double * tabVectorB = 0;
 	double * tabVectorBeta = 0;
 	double* tabX = 0; // ostatnia iteracja
@@ -228,7 +228,7 @@ private:
 		double tmpX;
 		double epsilon = 0.0001;
 		double sum1 = 0, sum2 = 0;
-		
+
 
 		bool a = divideByZero(tabMatrixA, size);
 		int iterationNumber = 0;
@@ -240,47 +240,52 @@ private:
 				tabX[i] = tabVectorBeta[i];
 			}
 			do {
+
 				prevX = tabX;
-				iterationNumber++;
 				tmpX = tabX[size - 1];
-				
-					for (int it = 0; it < size; it++) // it - index x 
+
+				for (int it = 0; it < size; it++) // it - index x 
+				{
+					sum1 = 0;
+					sum2 = 0;
+					if (it == 0)
 					{
-						if (it == 0)
+						for (int j = 1; j < size; j++)
 						{
-							for (int j = 1; j < size; j++)
-							{
-								sum1 += tabMatrixAlfa[0][j] * prevX[j];
-							}
-							double aab = sum1 + tabVectorBeta[it];
-							tabX[it] = sum1 + tabVectorBeta[it];
-							normI = fabs(tabX[size - 1] - tmpX);
+							sum1 += tabMatrixAlfa[0][j] * prevX[j];
 						}
-						else
-						{
-								for (int j = 0; j < size - 1; j++)
-								{
-									sum1 += tabMatrixAlfa[it][j] * tabX[j];
-								}
-							
-							for (int i = 1; i <= size; i++)
-								for (int j = i + 1; j < size; j++)
-								{
-									sum2 += tabMatrixAlfa[it][j] * prevX[j];
-								}
-							double ab = sum1 + sum2 + tabVectorBeta[it];
-							tabX[it] = sum1 + sum2 + tabVectorBeta[it];
-							normI = fabs(tabX[size - 1] - tmpX);
-						}
-						/*if (it == (size - 1)) {
-							tabY = new double[size];
-							double * tmp;
-							tmp = tabX;
-							tabX = tabY;
-							tabY = tmp;
-						}*/
+						tabX[it] = sum1 + tabVectorBeta[it];
+						double aab = sum1 + tabVectorBeta[it];
+						normI = fabs(tabX[size - 1] - tmpX);
 					}
-				
+					else
+					{
+						for (int j = 0; j < size - 1; j++)
+						{
+							sum1 += tabMatrixAlfa[it][j] * tabX[j];
+						}
+
+						for (int i = 1; i <= size; i++)
+							for (int j = i + 1; j < size; j++)
+							{
+								sum2 += tabMatrixAlfa[it][j] * prevX[j];
+							}
+						double ab = sum1 + sum2 + tabVectorBeta[it];
+						tabX[it] = sum1 + sum2 + tabVectorBeta[it];
+						normI = fabs(tabX[size - 1] - tmpX);
+
+
+					}
+					iterationNumber++;
+					std::cout << "ITERACJA " << iterationNumber << "\n";
+					for (int i = 0; i < size; i++)
+					{
+						std::cout << tabX[i] << " ";
+					}
+					std::cout << "\n";
+
+				}
+
 			} while (normI >= epsilon && iterationNumber < MLI);
 			return tabX;
 		}
@@ -349,7 +354,7 @@ private:
 			{
 				//file << tabY[i] << "\t\t";
 			}
-			file << "\n" << "ILOSC ITERACJI: "<< iteration << "\n";
+			file << "\n" << "ILOSC ITERACJI: " << iteration << "\n";
 			file << "\n##########################################\n";
 		}
 	}
