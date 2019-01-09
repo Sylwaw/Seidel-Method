@@ -246,8 +246,9 @@ private:
 
 				for (int it = 0; it < size; it++) // it - index x 
 				{
-					sum1 = 0;
+					sum1 = 0;	
 					sum2 = 0;
+					
 					if (it == 0)
 					{
 						for (int j = 1; j < size; j++)
@@ -265,11 +266,10 @@ private:
 							sum1 += tabMatrixAlfa[it][j] * tabX[j];
 						}
 
-						for (int i = 1; i <= size; i++)
-							for (int j = i + 1; j < size; j++)
-							{
-								sum2 += tabMatrixAlfa[it][j] * prevX[j];
-							}
+						for (int j = it + 1; j < size; j++)
+						{
+							sum2 += tabMatrixAlfa[it][j] * prevX[j];
+						}
 						double ab = sum1 + sum2 + tabVectorBeta[it];
 						tabX[it] = sum1 + sum2 + tabVectorBeta[it];
 						normI = fabs(tabX[size - 1] - tmpX);
