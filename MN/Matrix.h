@@ -224,33 +224,33 @@ private:
 	{
 		int i = 0, j = 0;
 		double normI = 1;
+		double *prevX = 0, *tmpTabX;
 		double tmpX;
 		double epsilon = 0.0001;
 		double sum1 = 0, sum2 = 0;
 		
 
 		bool a = divideByZero(tabMatrixA, size);
-
+		int iterationNumber = 0;
 		if (a == false)
 		{
+			//zerowa iteracja
+			for (int i = 0; i < size; i++)
+			{
+				tabX[i] = tabVectorBeta[i];
+			}
 			do {
+				prevX = tabX;
 				iterationNumber++;
 				tmpX = tabX[size - 1];
-				if (iterationNumber == 1)
-				{
-					for (int i = 0; i < size; i++)
-						tabX[i] = tabVectorBeta[i];
-					
-				}
-				else
-				{
+				
 					for (int it = 0; it < size; it++) // it - index x 
 					{
 						if (it == 0)
 						{
 							for (int j = 1; j < size; j++)
 							{
-								sum1 += tabMatrixAlfa[i][j] * tabX[j];
+								sum1 += tabMatrixAlfa[0][j] * prevX[j];
 							}
 							double aab = sum1 + tabVectorBeta[it];
 							tabX[it] = sum1 + tabVectorBeta[it];
@@ -258,33 +258,29 @@ private:
 						}
 						else
 						{
-							for (int i = 1; i < size; i++)
-							{
 								for (int j = 0; j < size - 1; j++)
 								{
-									sum1 += tabMatrixAlfa[i][j] * tabX[j];
+									sum1 += tabMatrixAlfa[it][j] * tabX[j];
 								}
-							}
+							
 							for (int i = 1; i <= size; i++)
-							{
 								for (int j = i + 1; j < size; j++)
 								{
-									sum2 += tabMatrixAlfa[i][j] * tabX[j];
+									sum2 += tabMatrixAlfa[it][j] * prevX[j];
 								}
-							}
 							double ab = sum1 + sum2 + tabVectorBeta[it];
 							tabX[it] = sum1 + sum2 + tabVectorBeta[it];
 							normI = fabs(tabX[size - 1] - tmpX);
 						}
-						if (it == (size - 1)) {
+						/*if (it == (size - 1)) {
 							tabY = new double[size];
 							double * tmp;
 							tmp = tabX;
 							tabX = tabY;
 							tabY = tmp;
-						}
+						}*/
 					}
-				}
+				
 			} while (normI >= epsilon && iterationNumber < MLI);
 			return tabX;
 		}
@@ -351,7 +347,7 @@ private:
 			file << "\n" << "WEKTOR - POPRZEDNIA ITERACJA" << "\n";
 			for (int i = 0; i < size; i++)
 			{
-				file << tabY[i] << "\t\t";
+				//file << tabY[i] << "\t\t";
 			}
 			file << "\n" << "ILOSC ITERACJI: "<< iteration << "\n";
 			file << "\n##########################################\n";
