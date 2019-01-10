@@ -27,7 +27,7 @@ public:
 		std::cout << "\n";
 		double* abError = absoluteError(seidel, size);
 
-		generateRaportToFile("raport.txt", "ZESTAW 1", tabMatrixA, tabVectorB, matrixAlfa, vectorBeta, MLI, tabX, prevX, iterationNumber,abError); // generowanie raportu
+		generateRaportToFile("raport.txt", "ZESTAW 1", tabMatrixA, tabVectorB, matrixAlfa, vectorBeta, MLI, tabX, prevX, iterationNumber,abError, size); // generowanie raportu
 
 
 	}
@@ -229,16 +229,16 @@ private:
 		double tmpX;
 		double epsilon = 0.0001;
 		double sum1 = 0, sum2 = 0;
-
+		
 
 		bool a = divideByZero(tabMatrixA, size);
+		//zerowa iteracja
+		for (int i = 0; i < size; i++)
+		{
+			tabX[i] = tabVectorBeta[i];
+		}
 		if (a == false)
 		{
-			//zerowa iteracja
-			for (int i = 0; i < size; i++)
-			{
-				tabX[i] = tabVectorBeta[i];
-			}
 			do {
 
 				prevX = new double[size];
@@ -284,12 +284,7 @@ private:
 					
 					}
 					iterationNumber++;
-					/*std::cout << "ITERACJA " << iterationNumber << "\n";
-					for (int i = 0; i < size; i++)
-					{
-						std::cout << tabX[i] << " ";
-					}
-					std::cout << "\n";*/
+					
 				}
 
 			} while (normI >= epsilon && iterationNumber < MLI);
@@ -304,14 +299,15 @@ private:
 	}
 
 	void generateRaportToFile(std::string fileName, std::string raportName, double ** tabMatrixA, double * tabVectorB,
-		double ** tabMatrixAlfa, double * tabVectorBeta, int mli, double* tabX, double*tabY, int iteration,double* seidel) { // funkcja generujaca raport do pliku
+		double ** tabMatrixAlfa, double * tabVectorBeta, int mli, double* tabX, double*tabY, int iteration,double* seidel, int size) { // funkcja generujaca raport do pliku
 		std::fstream file;
 
 		file.open(fileName, std::ios::out | std::ios::trunc);
 
 		if (file.good() == true) {
+			file.setf(std::ios::scientific);
 			file << "\n############# DANE WEJSCIOWE #############";
-			file << "\nn = 5";
+			file << "\nn = " << size;
 			file << "\nepsilon = 0.0001";
 			file << "\nMLI = " << mli << "\n";
 			file << "\n\t" << raportName << "\n";
@@ -331,42 +327,59 @@ private:
 				file << tabVectorB[i] << "\t";
 			}
 			file << "\n##########################################\n";
-			file << "\n############# DANE POSREDNIE #############\n";
-			file << "\n" << "MACIERZ ALFA" << "\n";
-			for (int i = 0; i < size; i++)
+			if (divideByZero(tabMatrixA, size) == true)
 			{
-				for (int j = 0; j < size; j++)
+				file << "Obliczenia przerwane - nie mozna dzielic przez zero" << "\n";
+			}
+			else
+			{
+
+				file << "\n############# DANE POSREDNIE #############\n";
+				file << "\n" << "MACIERZ ALFA" << "\n";
+				for (int i = 0; i < size; i++)
 				{
-					file << tabMatrixAlfa[i][j] << "\t";
+					for (int j = 0; j < size; j++)
+					{
+						file << tabMatrixAlfa[i][j] << "\t";
+					}
+					file << "\n";
 				}
-				file << "\n";
-			}
 
-			file << "\n" << "WEKTOR BETA" << "\n";
-			for (int i = 0; i < size; i++)
-			{
-				file << tabVectorBeta[i] << "\t";
-			}
-			file << "\n##########################################\n";
-			file << "\n################# WYNIKI #################\n";
-			file << "\n\n" << "WEKTOR - OSTATNIA ITERACJA" << "\n";
-			for (int i = 0; i < size; i++)
-			{
-				file << tabX[i] << "\t\t";
-			}
+				file << "\n" << "WEKTOR BETA" << "\n";
+				for (int i = 0; i < size; i++)
+				{
+					file << tabVectorBeta[i] << "\t";
+				}
+				file << "\n##########################################\n";
+				file << "\n################# WYNIKI #################\n";
+				file << "\n\n" << "WEKTOR - OSTATNIA ITERACJA" << "\n";
+				for (int i = 0; i < size; i++)
+				{
+					file << tabX[i] << "\t\t";
+				}
 
-			file << "\n\n" << "WEKTOR - POPRZEDNIA ITERACJA" << "\n";
-			for (int i = 0; i < size; i++)
-			{
-				file << tabY[i] << "\t\t";
+				file << "\n\n" << "WEKTOR - POPRZEDNIA ITERACJA" << "\n";
+				for (int i = 0; i < size; i++)
+				{
+					file << tabY[i] << "\t\t";
+				}
+				file << "\n\n" << "BLAD ABSOLUTNY" << "\n";
+				for (int i = 0; i < size; i++)
+				{
+					file << seidel[i] << "\t\t";
+				}
+				file << "\n\n" << "ILOSC ITERACJI: " << iteration << "\n";
+				file << "\n##########################################\n";
+
+				if (ifConvergent(tabMatrixAlfa, size) == true)
+				{
+					file << "Proces zbie¿ny" << "\n";
+				}
+				else
+				{
+					file << "Proces nie jest zbiezny" << "\n";
+				}
 			}
-			file << "\n\n" << "BLAD ABSOLUTNY" << "\n";
-			for (int i = 0; i < size; i++)
-			{
-				file << seidel[i] << "\t\t";
-			}
-			file << "\n\n" << "ILOSC ITERACJI: " << iteration << "\n";
-			file << "\n##########################################\n";
 		}
 	}
 
@@ -376,7 +389,7 @@ private:
 		std::cout << "\n";
 	}
 
-	bool ifConvergent(double ** matrixA, int size)
+	bool ifConvergent(double ** matrixAlfa, int size)
 	{
 		double normI = 0;
 		double normII = 0;
@@ -385,20 +398,20 @@ private:
 		for (int j = 0; j < size; j++)
 		{
 			int i = size - 1;
-			normI = normI + fabs(matrixA[i][j]);
+			normI = normI + fabs(matrixAlfa[i][j]);
 		}
 
 		for (int i = 0; i < size; i++)
 		{
 			int j = size - 1;
-			normII = normII + fabs(matrixA[i][j]);
+			normII = normII + fabs(matrixAlfa[i][j]);
 		}
 
 		for (int i = 0; i < size; i++)
 		{
 			for (int j = 0; j < size; j++)
 			{
-				normIIItmp = normIIItmp + (matrixA[i][j] * matrixA[i][j]);
+				normIIItmp = normIIItmp + (matrixAlfa[i][j] * matrixAlfa[i][j]);
 			}
 		}
 
