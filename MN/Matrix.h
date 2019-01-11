@@ -356,6 +356,7 @@ private:
 			}
 
 			file << "\n\n" << "WEKTOR - POPRZEDNIA ITERACJA" << "\n";
+			file.setf(std::ios::scientific);
 			for (int i = 0; i < size; i++)
 			{
 				file << tabY[i] << "\t\t";
