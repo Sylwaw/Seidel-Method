@@ -28,10 +28,10 @@ public:
 		std::cout << "\n";
 		if (seidel != 0) {
 			double* abError = absoluteError(seidel, size);
-			generateRaportToFile("raport.txt", "ZESTAW 1", tabMatrixA, tabVectorB, matrixAlfa, vectorBeta, MLI, tabX, prevX, iterationNumber, abError, size); // generowanie raportu
+			generateRaportToFile("raport.txt", "ZESTAW 1", tabMatrixA, tabVectorB, matrixAlfa, vectorBeta, MLI, tabX, prevX, iterationNumber, abError); // generowanie raportu
 		}
 		else {
-			generateRaportToFile("raport.txt", "Nie mozna wykonac obliczen - dzielenie przez zero", tabMatrixA, tabVectorB, matrixAlfa, vectorBeta, MLI, tabX, prevX, iterationNumber, 0, size); // generowanie raportu
+			generateRaportToFile("raport.txt", "Nie mozna wykonac obliczen - dzielenie przez zero", tabMatrixA, tabVectorB, matrixAlfa, vectorBeta, MLI, tabX, prevX, iterationNumber, 0); // generowanie raportu
 		}
 	}
 
@@ -302,7 +302,7 @@ private:
 	}
 
 	void generateRaportToFile(std::string fileName, std::string raportName, double ** tabMatrixA, double * tabVectorB,
-		double ** tabMatrixAlfa, double * tabVectorBeta, int mli, double* tabX, double*tabY, int iteration,double* seidel, int size) { // funkcja generujaca raport do pliku
+		double ** tabMatrixAlfa, double * tabVectorBeta, int mli, double* tabX, double*tabY, int iteration,double* seidel) { // funkcja generujaca raport do pliku
 		std::fstream file;
 
 		file.open(fileName, std::ios::out | std::ios::trunc);
