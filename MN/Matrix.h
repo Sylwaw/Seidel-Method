@@ -20,16 +20,19 @@ public:
 
 		setMLI();
 		double* seidel = seidelMethod(tabMatrixA, matrixAlfa, vectorBeta, tabX, size, MLI); // SEIDEL
+		
 		std::cout << "\n";
 		print(size, matrixAlfa, vectorBeta, "MATRIX ALFA", "VECTOR BETA");
 		std::cout << "\n";
 		printX(size, tabX);
 		std::cout << "\n";
-		double* abError = absoluteError(seidel, size);
-
-		generateRaportToFile("raport.txt", "ZESTAW 1", tabMatrixA, tabVectorB, matrixAlfa, vectorBeta, MLI, tabX, prevX, iterationNumber,abError, size); // generowanie raportu
-
-
+		if (seidel != 0) {
+			double* abError = absoluteError(seidel, size);
+			generateRaportToFile("raport.txt", "ZESTAW 1", tabMatrixA, tabVectorB, matrixAlfa, vectorBeta, MLI, tabX, prevX, iterationNumber, abError, size); // generowanie raportu
+		}
+		else {
+			generateRaportToFile("raport.txt", "Nie mozna wykonac obliczen - dzielenie przez zero", tabMatrixA, tabVectorB, matrixAlfa, vectorBeta, MLI, tabX, prevX, iterationNumber, 0, size); // generowanie raportu
+		}
 	}
 
 
@@ -213,7 +216,7 @@ private:
 			{
 				if (i == j && matrixA[i][j] == 0)
 				{
-					std::cout << "Obliczenia przerwane, nie mo¿na dzieliæ przez 0" << std::endl;
+					std::cout << "Obliczenia przerwane, nie mozna dzielic przez 0" << std::endl;
 					a = true;
 				}
 			}
@@ -292,8 +295,8 @@ private:
 		}
 		else
 		{
-			std::cout << "Nie mo¿na wykonaæ obliczeñ - dzielenie przez zero";
-			exit(1);
+			std::cout << "Nie mozna wykonac obliczen - dzielenie przez zero";
+			return 0;
 		}
 
 	}
@@ -363,11 +366,14 @@ private:
 				{
 					file << tabY[i] << "\t\t";
 				}
-				file << "\n\n" << "BLAD ABSOLUTNY" << "\n";
-				for (int i = 0; i < size; i++)
-				{
-					file << seidel[i] << "\t\t";
+				if (seidel != 0) {
+					file << "\n\n" << "BLAD ABSOLUTNY" << "\n";
+					for (int i = 0; i < size; i++)
+					{
+						file << seidel[i] << "\t\t";
+					}
 				}
+				
 				file << "\n\n" << "ILOSC ITERACJI: " << iteration << "\n";
 				file << "\n##########################################\n";
 
