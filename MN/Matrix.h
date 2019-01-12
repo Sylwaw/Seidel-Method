@@ -11,21 +11,21 @@ public:
 
 	void run() {
 		readMatrixFromFile("matrix.txt");
-		std::cout << "\n";
-		print(size, tabMatrixA, tabVectorB, "MACIERZ A", "WEKTOR B"); // wypisywanie macierzy i wektora do konsoli, coœ jest Ÿle bo na przek¹tnej powinny byæ same zera
-		std::cout << "\n";
+		/*std::cout << "\n";
+		print(size, tabMatrixA, tabVectorB, "MACIERZ A", "WEKTOR B"); 
+		std::cout << "\n";*/
 		double** matrixAlfa = createTabMatrixAlfa(tabMatrixAlfa, size, tabMatrixA); // tworzenie macierzy alfa i jej uzupelnienie
-		double* vectorBeta = createTabVectorBeta(tabVectorBeta, size, tabVectorB, tabMatrixA); // tworzenie vectoru beta i jego uzupelnienie
+		double* vectorBeta = createTabVectorBeta(tabVectorBeta, size, tabVectorB, tabMatrixA); // tworzenie vectora beta i jego uzupelnienie
 		tabX = createTabx(tabX, size, vectorBeta);
 
 		setMLI();
 		double* seidel = seidelMethod(tabMatrixA, matrixAlfa, vectorBeta, tabX, size, MLI); // SEIDEL
 		
-		std::cout << "\n";
+		/*std::cout << "\n";
 		print(size, matrixAlfa, vectorBeta, "MATRIX ALFA", "VECTOR BETA");
 		std::cout << "\n";
 		printX(size, tabX);
-		std::cout << "\n";
+		std::cout << "\n";*/
 		if (seidel != 0) {
 			double* abError = absoluteError(seidel, size);
 			generateRaportToFile("raport.txt", "ZESTAW 1", tabMatrixA, tabVectorB, matrixAlfa, vectorBeta, MLI, tabX, prevX, iterationNumber, abError); // generowanie raportu
@@ -39,9 +39,9 @@ public:
 private:
 	std::list<double> listTMP; // zmienna uzyta dla okreslenia wielkosci macierzy
 	double ** tabMatrixA = 0; // macierz poczatkowa
-	double ** tabMatrixAlfa = 0;
-	double * tabVectorB = 0;
-	double * tabVectorBeta = 0;
+	double ** tabMatrixAlfa = 0; //macierz Alfa
+	double * tabVectorB = 0; // wektor pocz¹tkowy B
+	double * tabVectorBeta = 0; // wektor Beta
 	double* tabX = 0; // ostatnia iteracja
 	double* prevX = 0; // poprzednia iteracja
 	double x = 0;
@@ -120,19 +120,19 @@ private:
 		{
 			tabMatrix[i] = new double[size];
 		}
-		return tabMatrix; // a nie szlo z tych skorzystac? to jest to samo
+		return tabMatrix; 
 	}
 
 	double** copyListToTab(double ** tabMatrix, std::list<double> listTMP) { // kopiowanie wartosci z listy do tablicy
 		int i = 0;
-		for (double item : listTMP) { //co to? //wypisanie listy double
+		for (double item : listTMP) { 
 			tabMatrix[0][i] = item;
 			i++;
 		}
 		return tabMatrix;
 	}
 
-	void print(int size, double ** tabMatrix, double * tabVector, std::string matrixA, std::string vectorB) { // wypisywanie wartosci do konsoli
+	/*void print(int size, double ** tabMatrix, double * tabVector, std::string matrixA, std::string vectorB) { // wypisywanie wartosci do konsoli
 		std::cout << "\n" << matrixA << "\n";
 		for (int i = 0; i < size; i++)
 		{
@@ -157,7 +157,7 @@ private:
 		{
 			std::cout << tabX[i] << ", ";
 		}
-	}
+	}*/
 
 	double* createTabVector(double * tabVector, int size) { // funkcja alokujaca pamiec dla nowego wektora
 		return tabVector = new double[size];
@@ -404,28 +404,29 @@ private:
 		for (int j = 0; j < size; j++)
 		{
 			int i = size - 1;
-			normI = normI + fabs(matrixAlfa[i][j]);
+			normI += fabs(matrixAlfa[i][j]);
 		}
 
 		for (int i = 0; i < size; i++)
 		{
 			int j = size - 1;
-			normII = normII + fabs(matrixAlfa[i][j]);
+			normII += fabs(matrixAlfa[i][j]);
 		}
 
 		for (int i = 0; i < size; i++)
 		{
 			for (int j = 0; j < size; j++)
 			{
-				normIIItmp = normIIItmp + (matrixAlfa[i][j] * matrixAlfa[i][j]);
+				normIIItmp += (matrixAlfa[i][j] * matrixAlfa[i][j]);
 			}
 		}
 
-		normIIItmp = sqrt(normIIItmp);
+		normIII = sqrt(normIIItmp);
 
 		if (normI < 1 || normII < 1 || normIII < 1)
 		{
 			return true;
+
 		}
 
 		return false;
