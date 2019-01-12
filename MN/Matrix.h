@@ -11,9 +11,6 @@ public:
 
 	void run() {
 		readMatrixFromFile("matrix.txt");
-		std::cout << "\n";
-		print(size, tabMatrixA, tabVectorB, "MACIERZ A", "WEKTOR B"); // wypisywanie macierzy i wektora do konsoli, coœ jest Ÿle bo na przek¹tnej powinny byæ same zera
-		std::cout << "\n";
 		double** matrixAlfa = createTabMatrixAlfa(tabMatrixAlfa, size, tabMatrixA); // tworzenie macierzy alfa i jej uzupelnienie
 		double* vectorBeta = createTabVectorBeta(tabVectorBeta, size, tabVectorB, tabMatrixA); // tworzenie vectoru beta i jego uzupelnienie
 		tabX = createTabx(tabX, size, vectorBeta);
@@ -21,16 +18,10 @@ public:
 		setMLI();
 		double* seidel = seidelMethod(tabMatrixA, matrixAlfa, vectorBeta, tabX, size, MLI); // SEIDEL
 		std::cout << "\n";
-		print(size, matrixAlfa, vectorBeta, "MATRIX ALFA", "VECTOR BETA");
-		std::cout << "\n";
-		printX(size, tabX);
-		std::cout << "\n";
 
 		generateRaportToFile("raport.txt", "ZESTAW 1", tabMatrixA, tabVectorB, matrixAlfa, vectorBeta, MLI, tabX, tabY, iterationNumber); // generowanie raportu
 
-
 	}
-
 
 private:
 	std::list<double> listTMP; // zmienna uzyta dla okreslenia wielkosci macierzy
@@ -116,44 +107,18 @@ private:
 		{
 			tabMatrix[i] = new double[size];
 		}
-		return tabMatrix; // a nie szlo z tych skorzystac? to jest to samo
+		return tabMatrix; 
 	}
 
 	double** copyListToTab(double ** tabMatrix, std::list<double> listTMP) { // kopiowanie wartosci z listy do tablicy
 		int i = 0;
-		for (double item : listTMP) { //co to? //wypisanie listy double
+		for (double item : listTMP) { 
 			tabMatrix[0][i] = item;
 			i++;
 		}
 		return tabMatrix;
 	}
 
-	void print(int size, double ** tabMatrix, double * tabVector, std::string matrixA, std::string vectorB) { // wypisywanie wartosci do konsoli
-		std::cout << "\n" << matrixA << "\n";
-		for (int i = 0; i < size; i++)
-		{
-			for (int j = 0; j < size; j++)
-			{
-				std::cout << tabMatrix[i][j] << "\t\t";
-			}
-			std::cout << "\n\n";
-		}
-
-		std::cout << vectorB << "\n";
-		for (int i = 0; i < size; i++)
-		{
-			std::cout << tabVector[i] << " ";
-		}
-	}
-
-	void printX(int size, double *tabX)
-	{
-		std::cout << "\nTAB X" << std::endl;
-		for (int i = 0; i < size; i++)
-		{
-			std::cout << tabX[i] << ", ";
-		}
-	}
 
 	double* createTabVector(double * tabVector, int size) { // funkcja alokujaca pamiec dla nowego wektora
 		return tabVector = new double[size];
@@ -168,7 +133,7 @@ private:
 		return tabX;
 	}
 
-	double* createTabVectorBeta(double * tabVectorBeta, int size, double * tabVectorB, double **tabMatrixA) { // funkcja alokujaca pamiec dla nowego wektora
+	double* createTabVectorBeta(double * tabVectorBeta, int size, double * tabVectorB, double **tabMatrixA) { // funkcja alokujaca pamiec dla nowego wektora i tworzaca wektor Beta
 		tabVectorBeta = new double[size];
 		for (int i = 0; i < size; i++)
 		{
@@ -177,7 +142,7 @@ private:
 		return tabVectorBeta;
 	}
 
-	double** createTabMatrixAlfa(double ** tabMatrixAlfa, int size, double** tabMatrixA) { // funkcja alokujaca pamiec dla nowej macierzy
+	double** createTabMatrixAlfa(double ** tabMatrixAlfa, int size, double** tabMatrixA) { // funkcja alokujaca pamiec dla nowej macierzy i tworz¹ca macierz Alfa
 		tabMatrixAlfa = new double *[size];
 		for (int i = 0; i < size; i++)
 		{
@@ -203,6 +168,7 @@ private:
 		return tabMatrixAlfa;
 	}
 
+	//funkcja sprawdzaj¹ca czy na przekatnej macierzy znajduja sie zera
 	bool divideByZero(double **matrixA, int size)
 	{
 		bool a = false;
@@ -220,6 +186,7 @@ private:
 		return a;
 	}
 
+	//implementacja glownego algorytmu
 	double* seidelMethod(double** tabMatrixA, double** tabMatrixAlfa, double* tabVectorBeta, double* tabX, int size, int MLI)
 	{
 		int i = 0, j = 0;
