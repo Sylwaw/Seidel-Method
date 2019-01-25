@@ -4,6 +4,7 @@
 #include <string>
 #include <list>
 #include <cmath>
+#include <iomanip>
 
 class Matrix
 {
@@ -20,7 +21,7 @@ public:
 
 		setMLI();
 		double* seidel = seidelMethod(tabMatrixA, matrixAlfa, vectorBeta, tabX, size, MLI); // SEIDEL
-		
+
 		std::cout << "\n";
 		print(size, matrixAlfa, vectorBeta, "MATRIX ALFA", "VECTOR BETA");
 		std::cout << "\n";
@@ -232,15 +233,15 @@ private:
 		double tmpX;
 		double epsilon = 0.0001;
 		double sum1 = 0, sum2 = 0;
-		
 
-		bool a = divideByZero(tabMatrixA, size);
+
+
 		//zerowa iteracja
 		for (int i = 0; i < size; i++)
 		{
 			tabX[i] = tabVectorBeta[i];
 		}
-		if (a == false)
+		if (!divideByZero(tabMatrixA, size))
 		{
 			do {
 
@@ -262,35 +263,48 @@ private:
 						{
 							sum1 += tabMatrixAlfa[0][j] * prevX[j];
 						}
-						tabX[it] = sum1 + tabVectorBeta[it];
-						double aab = sum1 + tabVectorBeta[it];
+						tabX[it] = sum1 + tabVectorBeta[it];// klepej
 						normI = fabs(tabX[size - 1] - tmpX);
 					}
-					for (int i = 1; i < size; i++)
+					else { // f 10  nie 11
+						for (int i = 1; i < size; i++)
+						{
+							sum1 = 0;
+							sum2 = 0;
+							for (int j = 0; j <= i - 1; j++)
+							{
+								if (i == j) continue;
+								 
+								double tempAlfa = tabMatrixAlfa[i][j];
+								double tempX = tabX[j];
+								double temp = tabMatrixAlfa[i][j] * tabX[j]; 
+								sum1 += tabMatrixAlfa[i][j] * tabX[j];  
+							}
+
+							for (int j = i + 1; j < size; j++) 
+							{
+								double tempAlfa = tabMatrixAlfa[i][j];
+								double tempX = prevX[j];
+								double temp = tabMatrixAlfa[i][j] * prevX[j];
+								sum2 += tabMatrixAlfa[i][j] * prevX[j];
+							}
+							double a = sum1 + sum2 + tabVectorBeta[i];
+							tabX[i] = sum1 + sum2 + tabVectorBeta[i];
+							normI = fabs(tabX[size - 1] - tmpX);
+						}
+
+					}
+					for (int i = 0; i < size; i++)//co to w ogole jest? to wypisuje? to je sprawdzanie zebych wiedziol co je na konsoli to je tymczasowe
 					{
-						sum1 = 0;
-						sum2 = 0;
-						for (int j = 0; j < size - 1; j++)
-						{
-							sum1 += tabMatrixAlfa[i][j] * tabX[j];
-						}
-
-						for (int j = i + 1; j < size; j++)
-						{
-							sum2 += tabMatrixAlfa[i][j] * prevX[j];
-						}
-						double ab = sum1 + sum2 + tabVectorBeta[i];
-						tabX[i] = sum1 + sum2 + tabVectorBeta[i];
-						normI = fabs(tabX[size - 1] - tmpX);
-
-					
-					
+						std::cout << tabX[i] << " ";
 					}
-					iterationNumber++;
-					
-				}
+					std::cout << "\n";
+					std::cout << "iteracja " << iterationNumber << "\n";
 
-			} while (normI >= epsilon && iterationNumber < MLI);
+
+				}
+				iterationNumber++;
+			} while (normI >= epsilon && iterationNumber <= MLI);
 			return tabX;
 		}
 		else
@@ -302,13 +316,12 @@ private:
 	}
 
 	void generateRaportToFile(std::string fileName, std::string raportName, double ** tabMatrixA, double * tabVectorB,
-		double ** tabMatrixAlfa, double * tabVectorBeta, int mli, double* tabX, double*tabY, int iteration,double* seidel) { // funkcja generujaca raport do pliku
+		double ** tabMatrixAlfa, double * tabVectorBeta, int mli, double* tabX, double*tabY, int iteration, double* seidel) { // funkcja generujaca raport do pliku
 		std::fstream file;
 
 		file.open(fileName, std::ios::out | std::ios::trunc);
 
 		if (file.good() == true) {
-			file.setf(std::ios::scientific);
 			file << "\n############# DANE WEJSCIOWE #############";
 			file << "\nn = " << size;
 			file << "\nepsilon = 0.0001";
@@ -319,7 +332,7 @@ private:
 			{
 				for (int j = 0; j < size; j++)
 				{
-					file << tabMatrixA[i][j] << "\t";
+					file << std::setprecision(10) << std::fixed << tabMatrixA[i][j] << "\t";
 				}
 				file << "\n";
 			}
@@ -327,12 +340,12 @@ private:
 			file << "\n" << "WEKTOR B" << "\n";
 			for (int i = 0; i < size; i++)
 			{
-				file << tabVectorB[i] << "\t";
+				file << std::setprecision(10) << std::fixed << tabVectorB[i] << "\t";
 			}
 			file << "\n##########################################\n";
 			if (divideByZero(tabMatrixA, size) == true)
 			{
-				file << "Obliczenia przerwane - nie mozna dzielic przez zero" << "\n";
+				file << std::setprecision(10) << std::fixed << "Obliczenia przerwane - nie mozna dzielic przez zero" << "\n";
 			}
 			else
 			{
@@ -343,7 +356,7 @@ private:
 				{
 					for (int j = 0; j < size; j++)
 					{
-						file << tabMatrixAlfa[i][j] << "\t";
+						file << std::setprecision(10) << std::fixed << tabMatrixAlfa[i][j] << "\t";
 					}
 					file << "\n";
 				}
@@ -351,29 +364,29 @@ private:
 				file << "\n" << "WEKTOR BETA" << "\n";
 				for (int i = 0; i < size; i++)
 				{
-					file << tabVectorBeta[i] << "\t";
+					file << std::setprecision(10) << std::fixed << tabVectorBeta[i] << "\t";
 				}
 				file << "\n##########################################\n";
 				file << "\n################# WYNIKI #################\n";
 				file << "\n\n" << "WEKTOR - OSTATNIA ITERACJA" << "\n";
 				for (int i = 0; i < size; i++)
 				{
-					file << tabX[i] << "\t\t";
+					file << std::setprecision(10) << std::fixed << tabX[i] << "\t\t";
 				}
 
 				file << "\n\n" << "WEKTOR - POPRZEDNIA ITERACJA" << "\n";
 				for (int i = 0; i < size; i++)
 				{
-					file << tabY[i] << "\t\t";
+					file << std::setprecision(10) << std::fixed << tabY[i] << "\t\t";
 				}
 				if (seidel != 0) {
 					file << "\n\n" << "BLAD ABSOLUTNY" << "\n";
 					for (int i = 0; i < size; i++)
 					{
-						file << seidel[i] << "\t\t";
+						file << std::setprecision(10) << std::fixed << seidel[i] << "\t\t";
 					}
 				}
-				
+
 				file << "\n\n" << "ILOSC ITERACJI: " << iteration << "\n";
 				file << "\n##########################################\n";
 
