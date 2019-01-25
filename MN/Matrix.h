@@ -252,57 +252,42 @@ private:
 				}
 				tmpX = tabX[size - 1];
 
-				for (int it = 0; it < size; it++) // it - index x 
+
+				sum1 = 0;
+				sum2 = 0;
+
+				for (int j = 1; j < size; j++)
+				{
+					sum1 += tabMatrixAlfa[0][j] * prevX[j];
+				}
+				tabX[0] = sum1 + tabVectorBeta[0];// klepej
+				normI = fabs(tabX[size - 1] - tmpX);
+
+				for (int i = 1; i < size; i++)
 				{
 					sum1 = 0;
 					sum2 = 0;
-
-					if (it == 0)
+					for (int j = 0; j <= i - 1; j++)
 					{
-						for (int j = 1; j < size; j++)
-						{
-							sum1 += tabMatrixAlfa[0][j] * prevX[j];
-						}
-						tabX[it] = sum1 + tabVectorBeta[it];// klepej
-						normI = fabs(tabX[size - 1] - tmpX);
+						if (i == j) continue;
+						sum1 += tabMatrixAlfa[i][j] * tabX[j];
 					}
-					else { // f 10  nie 11
-						for (int i = 1; i < size; i++)
-						{
-							sum1 = 0;
-							sum2 = 0;
-							for (int j = 0; j <= i - 1; j++)
-							{
-								if (i == j) continue;
-								 
-								double tempAlfa = tabMatrixAlfa[i][j];
-								double tempX = tabX[j];
-								double temp = tabMatrixAlfa[i][j] * tabX[j]; 
-								sum1 += tabMatrixAlfa[i][j] * tabX[j];  
-							}
 
-							for (int j = i + 1; j < size; j++) 
-							{
-								double tempAlfa = tabMatrixAlfa[i][j];
-								double tempX = prevX[j];
-								double temp = tabMatrixAlfa[i][j] * prevX[j];
-								sum2 += tabMatrixAlfa[i][j] * prevX[j];
-							}
-							double a = sum1 + sum2 + tabVectorBeta[i];
-							tabX[i] = sum1 + sum2 + tabVectorBeta[i];
-							normI = fabs(tabX[size - 1] - tmpX);
-						}
-
-					}
-					for (int i = 0; i < size; i++)//co to w ogole jest? to wypisuje? to je sprawdzanie zebych wiedziol co je na konsoli to je tymczasowe
+					for (int j = i + 1; j < size; j++)
 					{
-						std::cout << tabX[i] << " ";
+						sum2 += tabMatrixAlfa[i][j] * prevX[j];
 					}
-					std::cout << "\n";
-					std::cout << "iteracja " << iterationNumber << "\n";
-
-
+					tabX[i] = sum1 + sum2 + tabVectorBeta[i];
+					normI = fabs(tabX[size - 1] - tmpX);
 				}
+
+				for (int i = 0; i < size; i++)//co to w ogole jest? to wypisuje? to je sprawdzanie zebych wiedziol co je na konsoli to je tymczasowe
+				{
+					std::cout << tabX[i] << " ";
+				}
+				std::cout << "\n";
+				std::cout << "iteracja " << iterationNumber << "\n";
+
 				iterationNumber++;
 			} while (normI >= epsilon && iterationNumber <= MLI);
 			return tabX;
